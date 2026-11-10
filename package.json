@@ -1,0 +1,65 @@
+{
+  "name": "chatluna-plugin-emojis",
+  "version": "0.0.1",
+  "description": "ChatLuna v2 Emoji Kitchen 合成插件，支持聊天命令、表情目录、合成预览与离线元数据缓存",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sor85/chatluna-plugin-emojis.git"
+  },
+  "homepage": "https://github.com/Sor85/chatluna-plugin-emojis#readme",
+  "bugs": {
+    "url": "https://github.com/Sor85/chatluna-plugin-emojis/issues"
+  },
+  "keywords": ["chatluna-plugin", "emoji", "emoji-kitchen"],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": { "types": "./lib/index.d.ts", "default": "./lib/index.js" },
+    "./package.json": "./package.json",
+    "./client": { "types": "./client/index.ts", "default": "./client/index.ts" }
+  },
+  "files": ["lib", "dist", "src", "client", "README.md", "LICENSE"],
+  "engines": { "node": ">=24.0.0" },
+  "scripts": {
+    "sync": "node scripts/sync-to-v2.mjs --once",
+    "sync:watch": "node scripts/sync-to-v2.mjs",
+    "build": "yakumo build",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.client.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@chatluna/schema": ">=2.0.0-alpha.0",
+    "@chatluna/utils": ">=2.0.0-alpha.0",
+    "@chatluna/ui-server": ">=2.0.0-alpha.0",
+    "@satorijs/core": "~4.6.1",
+    "cordis": "^4.0.0-rc.12"
+  },
+  "peerDependenciesMeta": { "@chatluna/ui-server": { "optional": true } },
+  "devDependencies": {
+    "@chatluna/permission": "workspace:*",
+    "@chatluna/schema": "workspace:*",
+    "@chatluna/ui-client": "workspace:*",
+    "@chatluna/ui-kit": "workspace:*",
+    "@chatluna/ui-server": "workspace:*",
+    "@chatluna/utils": "workspace:*",
+    "@cordisjs/plugin-http": "^1.5.2",
+    "@satorijs/core": "~4.6.1",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "cordis": "4.0.0-rc.12",
+    "jsdom": "^31.0.0",
+    "koishi": "npm:@koishijs/core@4.18.11",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "7.0.2",
+    "vitest": "^3.2.4",
+    "yaml": "^2.8.1"
+  },
+  "cordis": {
+    "description": { "zh": "两个 emoji 合成图片，支持目录预览与元数据缓存", "en": "Combine two emoji with a browsable catalog and cached Emoji Kitchen metadata" },
+    "service": { "required": ["koishi", "http", "permissions"], "optional": ["chatluna_webui"] }
+  }
+}
