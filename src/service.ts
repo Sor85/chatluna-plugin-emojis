@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { Schema } from '@chatluna/schema'
 import type { Config } from './config'
 import { buildIndex } from './metadata'
-import type { CatalogRequest, CatalogView, KitchenIndex, KitchenStatus, MixResult, UpdateError, UpdateResult } from './types'
+import type { KitchenIndex, KitchenStatus, MixResult, UpdateError, UpdateResult } from './types'
 import { combinationKey, emojiCodepoint, parsePair } from './utils'
 
 const Unknown: Schema<unknown> = Schema.any()
@@ -37,8 +37,7 @@ export class EmojiKitchen {
     private readonly config: Config,
     private readonly fetcher: typeof fetch,
     directory: string,
-    private readonly signal: AbortSignal,
-    private readonly changed: () => void = () => {}
+    private readonly signal: AbortSignal
   ) {
     this.maxBytes = config.maxMetadataSize * 1024 * 1024
     this.cacheFile = join(directory, 'metadata.json')
@@ -76,18 +75,7 @@ export class EmojiKitchen {
     } catch (error) {
       if (this.signal.aborted) return
       if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) this.error = 'cache'
-    } finally {
-      if (!this.signal.aborted) this.changed()
     }
-  }
-
-  catalog({ query, page }: CatalogRequest): CatalogView {
-    const needle = query.trim().toLowerCase()
-    const items = (this.index?.items ?? []).filter((item) => !needle ||
-      [item.emoji, item.id, item.name, ...item.keywords].some((value) => value.toLowerCase().includes(needle)))
-    const pages = Math.max(1, Math.ceil(items.length / 48))
-    const current = Math.min(Math.max(1, page), pages)
-    return { items: items.slice((current - 1) * 48, current * 48), total: items.length, page: current, pages }
   }
 
   mix(input: string): MixResult {
@@ -108,9 +96,7 @@ export class EmojiKitchen {
       return { kind: 'failed', reason }
     }).finally(() => {
       this.updating = undefined
-      if (!this.signal.aborted) this.changed()
     })
-    this.changed()
     return this.updating
   }
 

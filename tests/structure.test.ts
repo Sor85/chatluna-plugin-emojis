@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { parse } from 'yaml'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const ignored = new Set(['node_modules', 'lib', 'dist', '.git', 'data', 'coverage'])
@@ -15,12 +14,6 @@ function files(directory: string): string[] {
   })
 }
 
-function keys(value: unknown, prefix = ''): string[] {
-  if (typeof value === 'string') return [prefix]
-  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error(`Invalid locale at ${prefix}`)
-  return Object.entries(value).flatMap(([key, item]) => keys(item, prefix ? `${prefix}.${key}` : key)).sort()
-}
-
 describe('repository contracts', () => {
   it('registers all scoped instructions and only existing paths', () => {
     const instructions = readFileSync(join(root, 'AGENTS.md'), 'utf8')
@@ -29,19 +22,12 @@ describe('repository contracts', () => {
     expect(declared).toEqual(actual)
     for (const path of declared) expect(existsSync(join(root, path))).toBe(true)
   })
-  it('keeps Chinese and English locale keys in sync', () => {
-    expect(keys(parse(readFileSync(join(root, 'client/locales/zh.yml'), 'utf8')))).toEqual(keys(parse(readFileSync(join(root, 'client/locales/en.yml'), 'utf8'))))
-  })
-  it('ships both faces without runtime data', () => {
+  it('ships the server entry without runtime data or a client page', () => {
     const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
-    expect(pkg.files).toEqual(expect.arrayContaining(['src', 'client', 'lib', 'dist', 'README.md', 'LICENSE']))
+    expect(pkg.files).toEqual(expect.arrayContaining(['src', 'lib', 'README.md', 'LICENSE']))
     expect(pkg.files).not.toContain('data')
-    expect(pkg.devDependencies['@chatluna/ui-client']).toBe('workspace:*')
+    expect(existsSync(join(root, 'client'))).toBe(false)
+    expect(Object.keys(pkg.devDependencies).filter((name) => name.startsWith('@chatluna/ui-'))).toEqual([])
     expect(pkg.cordis.service.required).toEqual(['koishi', 'http', 'permissions'])
-  })
-  it('keeps page typography explicit and leaves pointer/scroll styles to the host', () => {
-    const sources = files(join(root, 'client')).filter((file) => /\.(tsx?|css)$/.test(file)).map((file) => readFileSync(file, 'utf8')).join('\n')
-    expect(sources).toContain('text-sm leading-6')
-    expect(sources).not.toMatch(/cursor\s*:|cursor-|::-webkit-scrollbar|localStorage/)
   })
 })

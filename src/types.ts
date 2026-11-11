@@ -32,30 +32,7 @@ export interface KitchenStatus {
 
 export type UpdateResult = { kind: 'updated' | 'unchanged' } | { kind: 'failed'; reason: UpdateError }
 
-export interface CatalogView {
-  items: EmojiItem[]
-  total: number
-  page: number
-  pages: number
-}
-
-export interface CatalogRequest {
-  query: string
-  page: number
-}
-
 export interface KitchenIndex {
   items: EmojiItem[]
   combinations: Map<string, Combination>
-}
-
-declare module '@chatluna/ui-client/client' {
-  interface States {
-    'emojis.status': KitchenStatus
-    'emojis.catalog': CatalogView
-  }
-  interface Actions {
-    'emojis.mix': (input: { input: string }) => MixResult
-    'emojis.update': (input: Record<string, never>) => Promise<UpdateResult>
-  }
 }

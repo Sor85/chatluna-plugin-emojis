@@ -87,14 +87,6 @@ describe('metadata cache and lookup', () => {
     expect(await kitchen.update()).toEqual({ kind: 'updated' })
     expect(kitchen.status.error).toBeUndefined()
   })
-  it('searches names, codepoints, and emoji with bounded pages', async () => {
-    const kitchen = setup()
-    await kitchen.update()
-    for (const query of ['SMILE', '1f600', '😀']) {
-      expect(kitchen.catalog({ query, page: 99 })).toMatchObject({ total: 1, page: 1, pages: 1, items: [{ emoji: '😀' }] })
-    }
-    expect(kitchen.catalog({ query: 'does not exist', page: 1 }).items).toEqual([])
-  })
 })
 
 describe('update failure and lifecycle boundaries', () => {

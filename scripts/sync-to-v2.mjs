@@ -54,6 +54,8 @@ function sync() {
     if (!inside(realpathSync(target), realpathSync(output))) throw new Error('同步清理目标越界')
     rmSync(output)
     removed++
+    // 删除源码目录后，副本中只剩空目录，结构守卫会把它当成仍存在的源码目录。
+    for (let path = dirname(output); path !== target && readdirSync(path).length === 0; path = dirname(path)) rmSync(path, { recursive: true })
   }
   writeFileSync(manifest, JSON.stringify(files, null, 2))
   console.log(`同步完成：复制 ${copied}，删除 ${removed} → ${target}`)
