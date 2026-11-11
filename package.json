@@ -1,6 +1,6 @@
 {
   "name": "chatluna-plugin-emojis",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ChatLuna v2 Emoji Kitchen 合成插件，支持聊天命令与离线元数据缓存",
   "type": "module",
   "license": "MIT",
